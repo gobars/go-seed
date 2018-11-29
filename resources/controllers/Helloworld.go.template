@@ -1,0 +1,16 @@
+package controllers
+
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"{{.Path}}/common"
+	"{{.Path}}/models"
+)
+
+type HelloworldController struct {
+}
+
+func (ctr *HelloworldController) Hello(ctx *gin.Context) {
+	dao := models.HelloworldDao{}
+	ctx.JSON(http.StatusOK, common.Success(*dao.Hello()))
+}
