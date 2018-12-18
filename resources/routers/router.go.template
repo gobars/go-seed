@@ -1,12 +1,12 @@
 package routers
 
 import (
+	"{{.Path}}/controllers"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"os"
 	"regexp"
 	"time"
-	"{{.Path}}/controllers"
 )
 
 var router *gin.Engine

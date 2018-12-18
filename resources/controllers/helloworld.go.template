@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
 	"{{.Path}}/common"
 	"{{.Path}}/models"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type HelloworldController struct {

@@ -1,9 +1,9 @@
 package log
 
 import (
+	"{{.Path}}/config"
 	"os"
 	"github.com/sirupsen/logrus"
-	"{{.Path}}/config"
 )
 
 func Config(c *config.Config) {

@@ -1,15 +1,15 @@
 package main
 
 import (
+	"{{.Path}}/config"
+	"{{.Path}}/models"
+	"{{.Path}}/routers"
+	"{{.Path}}/log"
 	"fmt"
 	"flag"
 	"runtime/debug"
 	"os"
 	"strconv"
-	"{{.Path}}/config"
-	"{{.Path}}/models"
-	"{{.Path}}/routers"
-	"{{.Path}}/log"
 )
 
 var c = flag.String("c", "./etc/config.yaml", "config file path")
