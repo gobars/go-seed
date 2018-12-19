@@ -42,7 +42,7 @@ func main() {
 	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
 		panic("create dir error " + err.Error())
 	}
-	files := box.List();
+	files := box.List()
 	for _, f := range files {
 		if strings.HasPrefix(f, ".") {
 			continue
