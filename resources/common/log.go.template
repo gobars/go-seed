@@ -1,0 +1,84 @@
+package common
+
+import (
+	"github.com/lestrrat-go/file-rotatelogs"
+	"github.com/pkg/errors"
+	"github.com/rifflock/lfshook"
+	"github.com/sirupsen/logrus"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+// 参考链接： https://tech.mojotv.cn/2018/12/27/golang-logrus-tutorial
+func InitLogger(logLevel, logFile string) {
+	writer, err := rotatelogs.New(
+		logFile+".%Y%m%d%H%M",
+		rotatelogs.WithLinkName(logFile),          // 生成软链，指向最新日志文件
+		rotatelogs.WithMaxAge(7*24*time.Hour),     // 文件最大保存时间
+		rotatelogs.WithRotationTime(24*time.Hour), // 日志切割时间间隔
+	)
+	if err != nil {
+		logrus.Errorf("config local file system logger error. %v", errors.WithStack(err))
+	}
+
+	//只有gin为release并且配置了logfile的时候，会创建日志文件，
+	if logFile != "" {
+		setOutputFile(logFile)
+	}
+
+	level := Decode(logLevel,
+		"debug", logrus.DebugLevel,
+		"info", logrus.InfoLevel,
+		"warn", logrus.WarnLevel,
+		"error", logrus.ErrorLevel,
+		logrus.InfoLevel).(logrus.Level)
+	logrus.SetLevel(level)
+
+	lfHook := lfshook.NewHook(lfshook.WriterMap{
+		logrus.DebugLevel: writer, // 为不同级别设置不同的输出目的
+		logrus.InfoLevel:  writer,
+		logrus.WarnLevel:  writer,
+		logrus.ErrorLevel: writer,
+		logrus.FatalLevel: writer,
+		logrus.PanicLevel: writer,
+	}, &logrus.TextFormatter{})
+	logrus.AddHook(lfHook)
+}
+
+func setOutputFile(logFile string) {
+	if err := os.MkdirAll(filepath.Dir(logFile), 0755); err != nil {
+		logrus.Errorf("mkdir %s error %s", logFile, err.Error())
+		return
+	}
+	logF, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY, 0755)
+	if err != nil {
+		logrus.Errorf("open log file %s error %s", logFile, err.Error())
+		return
+	}
+	logrus.SetOutput(logF)
+}
+
+// LogErr logs err if it is not nil
+func LogErr(err error) {
+	if err != nil {
+		logrus.Warnf("error %v", err)
+	}
+}
+
+// Decode acts like oracle decode.
+func Decode(target interface{}, decodeVars ...interface{}) interface{} {
+	length := len(decodeVars)
+	i := 0
+	for ; i+1 < length; i += 2 {
+		if target == decodeVars[i] {
+			return decodeVars[i+1]
+		}
+	}
+
+	if i < length {
+		return decodeVars[i]
+	}
+
+	return nil
+}

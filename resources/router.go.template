@@ -1,9 +1,10 @@
-package routers
+package main
 
 import (
-	"{{.Path}}/controllers"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"{{.Path}}/controller"
+	"net/http"
 	"os"
 	"regexp"
 	"time"
@@ -12,11 +13,18 @@ import (
 var router *gin.Engine
 
 //配置所有路由
-func init() {
-	router = gin.New()
+func InitRouter() {
+	router = gin.Default()
 	router.Use(logger())
-
-	helloworldController := controllers.HelloworldController{}
+	router.HEAD("/", func(context *gin.Context) {
+		context.Status(http.StatusOK)
+		return
+	})
+	router.GET("/health", func(context *gin.Context) {
+		context.String(http.StatusOK, "%s", "OK")
+		return
+	})
+	helloworldController := controller.HelloworldController{}
 	router.GET("/hello", helloworldController.Hello)
 	router.NoRoute(func(c *gin.Context) {
 		pwd, _ := os.Getwd()
@@ -30,6 +38,10 @@ var staticReg = regexp.MustCompile(".(js|css|woff2|html|woff|ttf|svg|png|eot|map
 
 func logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodHead {
+			c.Next()
+			return
+		}
 		t := time.Now()
 		c.Next()
 		// after request
@@ -42,8 +54,4 @@ func logger() gin.HandlerFunc {
 		}
 
 	}
-}
-
-func Router() *gin.Engine {
-	return router
 }

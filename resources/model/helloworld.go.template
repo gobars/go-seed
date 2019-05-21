@@ -1,0 +1,14 @@
+package model
+
+type HelloworldDao struct {
+}
+
+type User struct {
+	Username string `db:"username" json:"username"`
+}
+
+func (dao *HelloworldDao) Hello() (user []User) {
+	user = make([]User, 0)
+	_ = dbx.Select(&user, "select username from `user`")
+	return
+}

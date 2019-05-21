@@ -1,0 +1,24 @@
+package model
+
+import (
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+)
+
+var dbx *sqlx.DB
+
+func InitDb() {
+	mysql := viper.Sub("mysql")
+	host := mysql.GetString("host")
+	db, _ := sql.Open("mysql", host)
+	db.SetMaxOpenConns(mysql.GetInt("max"))
+	db.SetMaxIdleConns(mysql.GetInt("maxIdle"))
+	ping := db.Ping()
+	if ping != nil {
+		logrus.Errorf("can not connect to mysql %s", host)
+	}
+	dbx = sqlx.NewDb(db, "mysql")
+}

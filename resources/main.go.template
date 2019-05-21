@@ -1,19 +1,10 @@
 package main
 
 import (
-	"{{.Path}}/config"
-	"{{.Path}}/models"
-	"{{.Path}}/routers"
-	"{{.Path}}/log"
 	"fmt"
-	"flag"
+	"github.com/spf13/viper"
 	"runtime/debug"
-	"os"
-	"strconv"
 )
-
-var c = flag.String("c", "./etc/config.yaml", "config file path")
-var version = flag.Bool("v", false, "show version")
 
 func main() {
 	defer func() {
@@ -23,22 +14,8 @@ func main() {
 		}
 	}()
 
-	flag.Parse()
-
-	if *version {
-		fmt.Println(config.VERSION)
-		os.Exit(0)
-		return
+	if err := router.Run(":" + viper.Sub("server").GetString("port")); err != nil {
+		fmt.Println(err)
 	}
-	cfg := config.Instance()
-	cfg.Load(*c)
-
-	//config log
-	log.Config(cfg)
-	//config mysql
-	models.Config(cfg)
-
-	router := routers.Router()
-	router.Run(":" + strconv.Itoa(cfg.Server.Port))
 
 }

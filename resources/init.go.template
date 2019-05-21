@@ -1,0 +1,60 @@
+package main
+
+import (
+	"fmt"
+	"{{.Path}}/common"
+	"{{.Path}}/model"
+	"os"
+	"path/filepath"
+
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+)
+
+// refer : https://blog.kowalczyk.info/article/vEja/embedding-build-number-in-go-executable.html
+var (
+	sha1ver   string // sha1 revision used to build the program
+	buildTime string // when the executable was built
+)
+
+func init() {
+	v := pflag.BoolP("version", "v", false, "show version and exit")
+	config := *pflag.StringP("config", "c", "./etc/config.yaml", "config file location")
+
+	pflag.Parse()
+
+	if *v {
+		fmt.Printf("Build on %s from sha1 %s\n", buildTime, sha1ver)
+		os.Exit(0)
+	}
+
+	configFileName := filepath.Base(config)
+	name, ext, err := common.ParseFileInfo(configFileName)
+	if err != nil {
+		fmt.Printf("Error Config file name %s, should like be config.yaml", configFileName)
+		os.Exit(1)
+	}
+
+	// 从当前位置读取config.toml配置文件
+	viper.SetConfigName(name)
+	viper.SetConfigType(ext)
+	viper.AddConfigPath(filepath.Dir(config))
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		fmt.Println("load config file error " + err.Error())
+		os.Exit(1)
+	}
+
+	// 绑定命令行参数，（优先级比配置文件高）
+	common.LogErr(viper.BindPFlags(pflag.CommandLine))
+	doInit()
+}
+
+//初始化日志，数据库等操作
+func doInit() {
+	//初始化日志
+	common.InitLogger(viper.GetString("logLevel"), viper.GetString("logFile"))
+	InitRouter()
+	model.InitDb()
+}

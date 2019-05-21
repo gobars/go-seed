@@ -1,0 +1,17 @@
+package common
+
+import (
+	"github.com/pkg/errors"
+	"strings"
+)
+
+//parse file name like abc.json name:abc ext:json err:error
+func ParseFileInfo(fileName string) (name string, ext string, err error) {
+	split := strings.Split(fileName, ".")
+	if len(split) != 2 {
+		err = errors.New("The wrong file name , please use xxx.xxx")
+		return
+	}
+
+	return split[0], split[1], err
+}

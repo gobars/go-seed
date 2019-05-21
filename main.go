@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/gobuffalo/packr"
+	"bytes"
 	"flag"
+	"fmt"
+	"github.com/gobuffalo/packr"
+	"io"
+	"io/ioutil"
 	"os"
 	"path"
-	"strings"
-	"fmt"
-	"text/template"
-	"bytes"
-	"io/ioutil"
 	"path/filepath"
-	"io"
+	"strings"
+	"text/template"
 )
 
 type Context struct {
@@ -58,12 +58,6 @@ func main() {
 		return
 	}
 
-	//if err := os.Rename(path.Join(dir, tempDir, root(*p)), path.Join(dir, root(*p))); err != nil {
-	//	cleanProject(path.Join(dir, tempDir))
-	//	fmt.Println("fail to create project " + *p + " with err " + err.Error())
-	//	os.Exit(0)
-	//	return
-	//}
 	cleanProject(path.Join(dir, tempDir))
 	fmt.Println("success create project " + *p)
 
