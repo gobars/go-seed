@@ -6,7 +6,7 @@
 
 # create project
 ``` shell
-cd /home/footstone
+cd $GOPATH/src
 go-seed -path=study/tools
 ```
 
@@ -40,3 +40,24 @@ this shell will create a project like:
 ```
 
 `go-seed -clean ` clean tmp dir .go-seed
+
+## Dep
+
+[dep](<https://github.com/golang/dep>) is a dependency management tool for Go. It requires Go 1.9 or newer to compile.
+
+## Installation
+
+```bash
+go get -u github.com/golang/dep/cmd/dep
+```
+
+Down dep to vendor
+
+```bash
+dep ensure -v
+```
+
+
+
+
+
